@@ -4,25 +4,117 @@
     <meta charset="UTF-8">
     <title>Página protegida</title>
 
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            width: 350px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        input[type=password] {
+            width: 90%;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: #2575fc;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #1b5cd7;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        #contenido {
+            color: white;
+            font-size: 22px;
+            text-align: center;
+        }
+    </style>
+
     <script>
-        // Aquí se define la contraseña
-        const PASSWORD_CORRECTA = "cielobesoasusanimales";
+        async function sha256(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hash))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
 
-        // Esto se ejecuta cuando cargue la página
-        window.onload = function() {
-            let pass = prompt("🔐 Ingrese la contraseña para entrar:");
+        async function validar() {
+            // Hash de "cielobesoasusanimales"
+            const hashCorrecto = "cielobesoasusanimales";
 
-            if (pass !== PASSWORD_CORRECTA) {
-                alert("❌ Contraseña incorrecta. No puedes entrar.");
-                // Regresar a la página anterior
-                window.location.href = "index.html";
+            const pass = document.getElementById("pass").value;
+            const hashIngresado = await sha256(pass);
+
+            if (hashIngresado === hashCorrecto) {
+                document.getElementById("loginCard").style.display = "none";
+                document.getElementById("contenido").style.display = "block";
+            } else {
+                alert("❌ Contraseña incorrecta");
             }
         }
     </script>
 </head>
 
 <body>
-    <h1>Bienvenido, entraste correctamente 👌</h1>
-    <p>Este contenido está protegido.</p>
+
+    <!-- LOGIN BONITO -->
+    <div class="card" id="loginCard">
+        <h2>🔐 Página protegida</h2>
+        <p>Ingrese la contraseña para continuar</p>
+
+        <input type="password" id="pass" placeholder="••••••••">
+        <button onclick="validar()">Entrar</button>
+    </div>
+
+    <!-- CONTENIDO OCULTO -->
+    <div id="contenido" style="display:none;">
+        <h1>Bienvenido ✔</h1>
+        <p>Contenido protegido con éxito.</p>
+    </div>
+
 </body>
 </html>
+
+
+
